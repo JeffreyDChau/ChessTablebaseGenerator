@@ -1,5 +1,21 @@
 import chess
 from stockfish import Stockfish
+import boto3
+from botocore.config import Config
+config = Config(
+    retries=dict(
+        max_attempts=20
+    )
+)
+dynamodb = boto3.resource(
+    'dynamodb',
+    aws_access_key_id='YOUR_ACCESS_KEY_ID',
+    aws_secret_access_key='YOUR_SECRET_ACCESS_KEY',
+    region_name='us-east-1',
+    config=config
+)
+table = dynamodb.Table('Three_Piece_Tablebase')
+
 stockfish = Stockfish(path="stockfish_15.1/stockfish-windows-2022-x86-64-avx2.exe")
 def isCheckmate(board):
     if board.is_checkmate():
@@ -23,8 +39,13 @@ def bestMove(board, move_count):
 def twoPieceGen(board):
     print("results will always equal draw for two piece board")
     print("Storing: \n" + "Starting fen: " + str(starting_fen) + "\nw/d/l: "+ "Draw" + "\nEnding fen: " + str(board.fen()))
+    item = {
+        'starting_fen': starting_fen,
+        'result': 'Draw',
+        'ending_fen': board.fen()
+    }
+    table.put_item(Item=item)
     
-
 def threePieceGen(board, move_count):
     if len(board.piece_map()) ==2:
         twoPieceGen(board)
@@ -52,7 +73,7 @@ def threePieceGen(board, move_count):
 ## --------------------------------------Start READING HERE -----------------------------------------
 #Diffrent board states to test
 #KRvK
-board = chess.Board("5k2/8/8/4R1K1/8/8/8/8 w - - 0 1")
+#board = chess.Board("5k2/8/8/4R1K1/8/8/8/8 w - - 0 1")
 
 #KPvK
 #board = chess.Board("8/8/P1K3k1/8/8/8/8/8 w - - 0 1")
@@ -61,7 +82,7 @@ board = chess.Board("5k2/8/8/4R1K1/8/8/8/8 w - - 0 1")
 #board = chess.Board("8/2Q5/6k1/8/3K4/8/8/8 w - - 0 1")
 
 #KvK
-#board = chess.Board("4k3/8/8/4K3/8/8/8/8 b - - 0 1")
+board = chess.Board("4k3/8/8/4K3/8/8/8/8 b - - 0 1")
 
 #KBvK
 #board = chess.Board("8/5k2/8/2B1K3/8/8/8/8 w - - 0 1")

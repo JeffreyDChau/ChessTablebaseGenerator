@@ -50,11 +50,6 @@ pip install boto3
 
 ### Generator.py
 
-
-
-```
-code blocks for commands
-```pip install chess
 ## Authors
 
 Contributors names and contact info

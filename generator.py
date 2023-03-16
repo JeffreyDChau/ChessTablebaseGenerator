@@ -40,7 +40,6 @@ def bestMove(board, move_count):
     board.push(best_move)
     move_count = move_count + 1
     print("move: " + str(move_count) +"\n" + str(board))
-
     threePieceGen(board, move_count)
 
 #Generates all possible positions for the king and stores tablebase which should always be a draw
@@ -114,16 +113,19 @@ def threePieceGen(board, move_count):
     else:
         bestMove(board, move_count)
 
+def possible_position(new_board):
+    threePieceGen(new_board)
+
 ## --------------------------------------Start READING HERE -----------------------------------------
 #Diffrent board states to test. Use to test if solver is working and to start the generator
 #KRvK
-board = chess.Board("5k2/8/8/4R1K1/8/8/8/8 w - - 0 1")
+#board = chess.Board("5k2/8/8/4R1K1/8/8/8/8 w - - 0 1")
 
 #KPvK
 #board = chess.Board("8/8/P1K3k1/8/8/8/8/8 w - - 0 1")
 
 #KQvK
-#board = chess.Board("8/2Q5/6k1/8/3K4/8/8/8 w - - 0 1")
+board = chess.Board("3k4/Q7/8/8/8/3K4/8/8 w - - 0 1")
 
 #KvK
 #board = chess.Board("4k3/8/8/4K3/8/8/8/8 b - - 0 1")
@@ -154,9 +156,21 @@ if len(board.piece_map()) ==3:
     if fenBoard.count("b") > 1 or fenBoard.count("B") >= 1 :
         print("Bishop and king cannot checkmate. Therefore draw")
         print("Storing: \n" + "Starting fen: " + str(starting_fen) + "\nw/d/l: "+ "Draw" + "\nEnding fen: " + str(board.fen()))
+        item = {
+                'starting_fen': board.fen(),
+                'result': 'Draw',
+                'ending_fen': board.fen()
+            }
+        table2.put_item(Item=item)
     elif fenBoard.__contains__('n') or fenBoard.__contains__('N'):
         print("Knight and king cannot checkmate. Therefore draw")
         print("Storing: \n" + "Starting fen: " + str(starting_fen) + "\nw/d/l: "+ "Draw" + "\nEnding fen: " + str(board.fen()))
+        item = {
+                'starting_fen': board.fen(),
+                'result': 'Draw',
+                'ending_fen': board.fen()
+            }
+        table2.put_item(Item=item)
     else:
         threePieceGen(board, 0)
     
